@@ -18,21 +18,11 @@ exports.getUsers = (req, res, next) => {
     });
 };
 
-exports.getUser = (req, res, next) => {
-  console.log("exports.getUser...");
-  userController
-    .getById(req.params.id)
-    .then(user => {
-      console.log("userController> exports.getUser.then:", user);
-      res
-        .status(200) //success
-        .json(user);
-    })
-    .catch(() => {
-      res
-        .status(500) //server error
-        .json({ errorMessage: "Error in getUser" });
-    });
+exports.getUser = (req, res) => {
+  console.log("getUser, with validate:", req.user);
+  res
+    .status(200) // success
+    .json(req.user);
 };
 
 exports.createUser = (req, res, next) => {
@@ -85,3 +75,58 @@ exports.deleteUser = (req, res, next) => {
         .json({ errorMessage: "Error in deleteUser" });
     });
 };
+
+//custom middleware
+
+function validateUserId(req, res, next) {
+  console.log("validateUserID...");
+  userController
+    .getById(req.params.id)
+    .then(user => {
+      console.log("validateUserId: ", user);
+      if (user) {
+        req.user = user;
+        next();
+      } else {
+        res
+          .status(400) //Bad Request
+          .json({ message: "ID not found" });
+      }
+    })
+    .catch(err => {
+      console.log("validateUserId, err: ", err);
+      res
+        .status(500) //server error
+        .json({ message: "server error" });
+    });
+}
+
+function validateUser(req, res, next) {
+  console.log("validatePost: ", req.body);
+  if (!req.body) {
+    res
+      .status(400) //Bad Request
+      .json({ message: "missing user information" });
+  } else if (!req.body.name) {
+    res
+      .status(400) //Bad Request
+      .json({ message: "missing user name" });
+  } else {
+    next();
+  }
+}
+
+function validatePost(req, res, next) {
+  console.log("validatePost: ", req.body);
+  if (!req.body) {
+    res
+      .status(400) //Bad Request
+      .json({ message: "missing post information" });
+  } else if (!req.body.text) {
+    res
+      .status(400) //Bad Request
+      .json({ message: "missing post text" });
+  } else {
+    next();
+  }
+}

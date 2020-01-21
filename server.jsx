@@ -7,7 +7,7 @@ const server = express();
 server.use(express.json());
 server.use(logger);
 server.use(cors());
-//server.use("/api/users", userRouter);
+server.use("/api/users", userRouter);
 //server.use("/api/posts", postRouter);
 
 server.get("/", (req, res) => {
@@ -19,7 +19,7 @@ server.get("/", (req, res) => {
 function logger(req, res, next) {
   console.log(
     `[${new Date().toISOString()}] ${req.method} to ${req.url} from ${req.get(
-      "Origin,"
+      "Origin"
     )}`
   );
   next();
