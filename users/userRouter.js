@@ -10,7 +10,7 @@ const {
   getUser,
   getUserPosts,
   createUser,
-  createUserPost,
+  // createUserPost,
   updateUser,
   deleteUser
 } = require("./userController.jsx");
@@ -26,10 +26,8 @@ router
   .put(validateUserId, validateUser, updateUser)
   .delete(validateUserId, deleteUser);
 
-router
-  .route("/:id/comments")
-  .get(validateUserId, getUserPosts)
-  .post(validateUserId, validatePost, createUserPost);
+router.route("/:id/comments").get(validateUserId, getUserPosts);
+// .post(validateUserId, validatePost, createUserPost);
 
 /*
 router.get("/:id", validateUserId, (req, res) => {
