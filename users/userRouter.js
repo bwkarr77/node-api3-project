@@ -7,8 +7,10 @@ console.log("userRouter running...");
 
 const {
   getUsers,
-  createUser,
   getUser,
+  getUserPosts,
+  createUser,
+  createUserPost,
   updateUser,
   deleteUser
 } = require("./userController.jsx");
@@ -16,13 +18,18 @@ const {
 router
   .route("/")
   .get(getUsers)
-  .post(createUser);
+  .post(validateUser, createUser);
 
 router
   .route("/:id")
   .get(validateUserId, getUser)
   .put(validateUserId, validateUser, updateUser)
   .delete(validateUserId, deleteUser);
+
+router
+  .route("/:id/comments")
+  .get(validateUserId, getUserPosts)
+  .post(validateUserId, validatePost, createUserPost);
 
 /*
 router.get("/:id", validateUserId, (req, res) => {
@@ -72,6 +79,7 @@ router.put("/:id", (req, res) => {
 //custom middleware
 
 function validateUserId(req, res, next) {
+  console.log("validateUserId: ", req.body);
   userDB
     .getById(req.params.id)
     .then(user => {
@@ -94,7 +102,7 @@ function validateUserId(req, res, next) {
 }
 
 function validateUser(req, res, next) {
-  console.log("validatePost: ", req.body);
+  console.log("validateUser: ", req.body);
   if (!req.body) {
     res
       .status(400) //Bad Request
@@ -114,7 +122,7 @@ function validatePost(req, res, next) {
     res
       .status(400) //Bad Request
       .json({ message: "missing post information" });
-  } else if (!req.body.text) {
+  } else if (!req.body.name) {
     res
       .status(400) //Bad Request
       .json({ message: "missing post text" });
